@@ -16,7 +16,7 @@ const pool = mysql.createPool({
 });
 
 
-// app.use(async function (req, res, next) { res.json("Hello")})
+// app.use(async function (req, res, next) { res.json("pool is ready")})
 
 
 app.use(async function (req, res, next) {
@@ -38,7 +38,7 @@ app.use(async function (req, res, next) {
     }
 });
 
-// app.use(async function (req, res, next) { res.json("Hi")})
+// app.use(async function (req, res, next) { res.json("db is connected")})
 
 app.use(cors());
 
@@ -46,8 +46,13 @@ app.use(express.json());
 
 app.get('/cars', async function (req, res) {
     try {
-        console.log('/cars/:id')
-        // res.json("Hi")
+        // console.log('get/cars')
+        const [allCars] = await req.db.query(
+            // `SELECT * from express_endpoint_practice.car`
+            `
+        SELECT * FROM express_endpoint_practice.car WHERE deleted_flag = '0';
+        `);
+        res.json({ allCars })
     } catch (err) {
 
     }
