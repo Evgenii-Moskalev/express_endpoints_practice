@@ -50,7 +50,7 @@ app.get('/cars', async function (req, res) {
         const [allCars] = await req.db.query(
             // `SELECT * from express_endpoint_practice.car`
             `
-        SELECT * FROM express_endpoint_practice.car WHERE deleted_flag = '0';
+        SELECT * FROM car WHERE deleted_flag = '0';
         `);
         res.json({ allCars })
     } catch (err) {
@@ -60,7 +60,7 @@ app.get('/cars', async function (req, res) {
 
 app.use(async function (req, res, next) {
     try {
-        console.log('Middleware after the get /cars');
+        // console.log('Middleware after the get /cars');
 
         await next();
 
