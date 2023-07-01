@@ -54,7 +54,8 @@ app.get('/cars', async function (req, res) {
         `);
         res.json({ allCars })
     } catch (err) {
-
+        console.log(err)
+        res.json({ err });
     }
 });
 
@@ -65,7 +66,8 @@ app.use(async function (req, res, next) {
         await next();
 
     } catch (err) {
-
+        console.log(err)
+        res.json({ err });
     }
 });
 
@@ -91,11 +93,19 @@ app.post('/car', async function (req, res) {
 
 app.delete('/car/:id', async function (req, res) {
     try {
-        console.log('req.params /car/:id', req.params)
+        // console.log('req.params /car/:id', req.params)
 
-        res.json('success')
+        const id = req.params.id;
+        // console.log(id);
+        const query = await req.db.query(`
+        DELETE FROM car
+        WHERE id = ${id};
+        `)
+
+        res.json('Car was deleted')
     } catch (err) {
-
+        console.log(err)
+        res.json({ err });
     }
 });
 
