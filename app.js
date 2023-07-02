@@ -84,7 +84,7 @@ app.post('/car', async function (req, res) {
                 year,
             }
         );
-
+        console.log(query);
         res.json({ success: true, message: 'Car successfully created', data: null });
     } catch (err) {
         res.json({ success: false, message: err, data: null })
@@ -109,11 +109,48 @@ app.delete('/car/:id', async function (req, res) {
     }
 });
 
-app.put('/car', async function (req, res) {
+app.put('/car/:id', async function (req, res) {
     try {
+        const id = parseInt(req.params.id);
+        const [allCars] = await req.db.query(`
+        SELECT * FROM car WHERE deleted_flag = 0;
+        `)
 
+
+        const found = allCars.some(car => car.id === id);
+
+        if (found) {
+            const { make: updMake, model: updModel, year: updYear } = req.body;
+
+            // console.log(typeof (make));
+            // const query = req.db.query(`
+            // UPDATE car
+            // SET make = '${make}', model = '${model}', year = ${year}
+            // WHERE id = ${id} 
+            // `);
+            try {
+                const query = await req.db.query(`
+                    UPDATE car
+                    SET make = :make, model = :model, year = :year
+                    WHERE id = :id
+            `, {
+                    make: updMake,
+                    model: updModel,
+                    year: updYear,
+                    id: id
+                });
+
+                res.json({ msg: `Car with id ${id} was updated`, info: `${query[0].info}` });
+                
+            } catch (error) {
+                res.json(error.message)
+            }
+
+        } else {
+            res.status(400).json({ msg: `Car with the id of ${req.params.id} is not exist in Car DB` })
+        }
     } catch (err) {
-
+        res.json(err)
     }
 });
 
