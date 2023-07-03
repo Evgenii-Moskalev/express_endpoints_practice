@@ -91,29 +91,11 @@ app.post('/car', async function (req, res) {
     }
 });
 
-app.delete('/car/:id', async function (req, res) {
-    try {
-        // console.log('req.params /car/:id', req.params)
-
-        const id = req.params.id;
-        // console.log(id);
-        const query = await req.db.query(`
-        DELETE FROM car
-        WHERE id = ${id};
-        `)
-
-        res.json('Car was deleted')
-    } catch (err) {
-        console.log(err)
-        res.json({ err });
-    }
-});
-
 app.put('/car/:id', async function (req, res) {
     try {
         const id = parseInt(req.params.id);
         const [allCars] = await req.db.query(`
-        SELECT * FROM car WHERE deleted_flag = 0;
+        SELECT * FROM car;
         `)
 
 
@@ -131,7 +113,7 @@ app.put('/car/:id', async function (req, res) {
             try {
                 const query = await req.db.query(`
                     UPDATE car
-                    SET make = :make, model = :model, year = :year
+                    SET make = :make, model = :model, year = :year, deleted_flag = '0'
                     WHERE id = :id
             `, {
                     make: updMake,
@@ -141,7 +123,7 @@ app.put('/car/:id', async function (req, res) {
                 });
 
                 res.json({ msg: `Car with id ${id} was updated`, info: `${query[0].info}` });
-                
+
             } catch (error) {
                 res.json(error.message)
             }
@@ -154,5 +136,22 @@ app.put('/car/:id', async function (req, res) {
     }
 });
 
+app.delete('/car/:id', async function (req, res) {
+    try {
+        // console.log('req.params /car/:id', req.params)
+
+        const id = req.params.id;
+        // console.log(id);
+        const query = await req.db.query(`
+        DELETE FROM car
+        WHERE id = ${id};
+        `)
+
+        res.json('Car was deleted')
+    } catch (err) {
+        console.log(err)
+        res.json({ err });
+    }
+});
 
 app.listen(port, () => console.log(`212 API Example listening on http://localhost:${port}`));
