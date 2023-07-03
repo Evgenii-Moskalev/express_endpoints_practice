@@ -140,14 +140,34 @@ app.delete('/car/:id', async function (req, res) {
     try {
         // console.log('req.params /car/:id', req.params)
 
-        const id = req.params.id;
-        // console.log(id);
-        const query = await req.db.query(`
-        DELETE FROM car
-        WHERE id = ${id};
-        `)
+        const id = parseInt(req.params.id);
+        const [allCars] = await req.db.query(`
+        SELECT * FROM car;
+        `);
 
-        res.json('Car was deleted')
+        const found = allCars.some(car => car.id === id);
+        if (found) {
+            try {
+                // console.log(id);
+                // const query = await req.db.query(`
+                // DELETE FROM car
+                // WHERE id = ${id};
+                // `)
+
+                const query = await req.db.query(`
+                    UPDATE car
+                    SET deleted_flag = '1'
+                    WHERE id = ${id}
+                 `);
+
+                res.json(`Car was flagged as deleted, deleted_flag of row with id:${id} now is = 1`)
+            } catch (error) {
+                res.json(error.message)
+            }
+        } else {
+            res.status(400).json({ msg: `Car with the id of ${req.params.id} is not exist in Car DB` })
+        }
+
     } catch (err) {
         console.log(err)
         res.json({ err });
